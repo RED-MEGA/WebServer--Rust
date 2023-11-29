@@ -11,6 +11,24 @@ pub struct Resquest {
 impl Resquest
 {
 	pub fn new(buff: String) -> Resquest {
+		
+		let request = match buff.lines().next() {
+			Some(line) => line,
+			None => panic!("Empty request") // you need handle this 
+		};
+		
+		let request: Vec<&str> = request.split(' ').collect();;
+	
+		let file;
+
+
+		let method_str = request[0]; // red
+		let method: Methods = match method_str {
+				"GET" => Methods::GET(file),
+				"POST" => Methods::POST(file),
+				"DELETE" => Methods::DELETE 
+		};
+ 
 		Resquest {
 			buff,
 			method: Methods::GET("index.html".to_string())

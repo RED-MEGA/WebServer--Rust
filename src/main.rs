@@ -19,10 +19,10 @@ fn handle_connection(mut stream: TcpStream)
 	let header = "HTTP/1.1 200 OK".to_string();
 	let body_path = match request.method {
 		Methods::GET(path) => path,
-		_ => "index.html".to_owned()
+		_ => "Not_Supported_method.html".to_owned()
 	};
 	let body = fs::read_to_string(ROOT.to_owned() + &body_path).unwrap();
-
+	
 	send_response(&stream, Response::new (
 		header,
 		body
