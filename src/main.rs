@@ -1,80 +1,27 @@
+pub mod methods;
+pub mod request;
+pub mod response;
+
 use std::fs;
 use std::net::{TcpListener, TcpStream};
-use std::io::prelude::*;
-use std::thread::sleep;
-use std::time::Duration;
+use methods::Methods;
+use request::*;
+use response::*;
 
-enum Methods {
-	GET(String),
-	POST(String),
-	DELETE
-}
-
-struct Resquest {
-	buff: String,
-	method: Methods,
-}
-
-// Methods::GET("index.html".to_string())
-impl Resquest
-{
-	fn new(buff: String) -> Resquest {
-		Resquest {
-			buff,
-			method: Methods::GET("index.html".to_string())
-		}
-	}
-}
-
-struct Response {
-	header: String,
-	body: String
-}
-
-impl Response
-{
-	fn new(header: String, body: String) -> Response {
-		Response {
-			header,
-			body
-		}
-	}
-}
-
-fn read_request(mut stream: &TcpStream) -> Resquest
-{
-	let mut buf = [0; 1024];
-
-	Resquest::new(|| -> String {
-		stream.read(&mut buf).unwrap();	
-		String::from_utf8_lossy(&buf[..]).to_string()
-	}())
-}
-
-fn send_response(mut stream: &TcpStream, response: Response)
-{
-	let buff = format!(
-		"{}\r\nContent-Length: {}\r\n\r\n{}",
-		response.header,
-		response.body.len(),
-		response.body
-	);
-	stream.write(buff.as_bytes()).unwrap();
-	stream.flush().unwrap();
-}
+const ROOT: &str = "www/";
 
 fn handle_connection(mut stream: TcpStream)
 {
-	let request = read_request(&stream);
+	let request = recive_request(&stream);
 
 	println!("Body =>{}<= END", request.buff);
 
 	let header = "HTTP/1.1 200 OK".to_string();
 	let body_path = match request.method {
 		Methods::GET(path) => path,
-		_ => "index.html".to_string()
+		_ => "index.html".to_owned()
 	};
-	let body = fs::read_to_string(body_path).unwrap();
+	let body = fs::read_to_string(ROOT.to_owned() + &body_path).unwrap();
 
 	send_response(&stream, Response::new (
 		header,
