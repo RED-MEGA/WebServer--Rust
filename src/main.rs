@@ -1,15 +1,28 @@
 use std::fs;
 use std::net::{TcpListener, TcpStream};
 use std::io::prelude::*;
+use std::thread::sleep;
+use std::time::Duration;
 
-struct Resquest {
-	buff: String	
+enum Methods {
+	GET(String),
+	POST(String),
+	DELETE
 }
 
+struct Resquest {
+	buff: String,
+	method: Methods,
+}
+
+// Methods::GET("index.html".to_string())
 impl Resquest
 {
 	fn new(buff: String) -> Resquest {
-		Resquest { buff }
+		Resquest {
+			buff,
+			method: Methods::GET("index.html".to_string())
+		}
 	}
 }
 
@@ -34,7 +47,7 @@ fn read_request(mut stream: &TcpStream) -> Resquest
 
 	Resquest::new(|| -> String {
 		stream.read(&mut buf).unwrap();	
-		buf[0].to_string()
+		String::from_utf8_lossy(&buf[..]).to_string()
 	}())
 }
 
@@ -54,14 +67,19 @@ fn handle_connection(mut stream: TcpStream)
 {
 	let request = read_request(&stream);
 
+	println!("Body =>{}<= END", request.buff);
+
 	let header = "HTTP/1.1 200 OK".to_string();
-	let body_path = "index.html";
+	let body_path = match request.method {
+		Methods::GET(path) => path,
+		_ => "index.html".to_string()
+	};
 	let body = fs::read_to_string(body_path).unwrap();
 
 	send_response(&stream, Response::new (
 		header,
 		body
-	))
+	));
 }
 
 fn setup() -> TcpListener
