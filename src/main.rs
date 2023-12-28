@@ -5,7 +5,7 @@ pub mod errors;
 
 use std::fs;
 use std::net::{TcpListener, TcpStream};
-use methods::Methods;
+use methods::*;
 use request::*;
 use response::*;
 use errors::*;
@@ -16,7 +16,6 @@ const OK_HEADER: &str = "HTTP/1.1 200 OK";
 fn handle_connection(stream: TcpStream)
 {
 	let request;
-	let body_path;
 	let body;
 
 	match recive_request(&stream) {

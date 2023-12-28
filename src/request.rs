@@ -17,8 +17,7 @@ impl Request
 		};
 		
 		let request: Vec<&str> = request.split(' ').collect();
-	
-		let file = String::from("index.html");
+
 
 		println!("<\n");
 		for elm in &request {
@@ -26,19 +25,17 @@ impl Request
 		}
 		println!("\n>");
 		
-
-		let method_str = request[0]; // red
-		let method: Methods = match method_str {
-				"GET" => Methods::GET(file),
-				"POST" => Methods::POST(file),
-				"DELETE" => Methods::DELETE,
+		let method = match request[0] {
+				"GET" => Methods::GET(request[1].to_owned()),
+				"POST" => Methods::POST(request[1].to_owned()),
+				"DELETE" => Methods::DELETE(request[1].to_owned()),
 				_ => Methods::EMPTY
 		};
  
 		Ok(Request {
 			buff,
 			method,
-			protocol: "HTTP/1.1".to_string()
+			protocol: request[3].to_owned()
 		})
 	}
 }

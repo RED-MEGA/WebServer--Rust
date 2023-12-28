@@ -1,6 +1,8 @@
 pub enum Methods {
 	GET(String),
 	POST(String),
-	DELETE,
+	DELETE(String),
 	EMPTY
 }
+
+const ROOT: &str = "./www";
