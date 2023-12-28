@@ -31,7 +31,7 @@ fn handle_connection(mut stream: TcpStream)
 
 fn setup() -> TcpListener
 {
-	TcpListener::bind("127.0.0.1:1337").unwrap()
+	TcpListener::bind("0.0.0.0:1337").unwrap()
 }
 
 fn event_loop(server: TcpListener)
