@@ -1,5 +1,7 @@
 use std::{net::TcpStream, io::Write};
 
+use crate::request::Request;
+
 pub struct Response {
 	pub header: String,
 	pub body: String
@@ -13,6 +15,11 @@ impl Response
 			body
 		}
 	}
+}
+
+pub fn gen_response(request: Request) -> Response
+{
+
 }
 
 pub fn send_response(mut stream: &TcpStream, response: Response)

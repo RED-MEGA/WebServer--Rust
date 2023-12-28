@@ -1,32 +1,43 @@
 pub mod methods;
 pub mod request;
 pub mod response;
+pub mod errors;
 
 use std::fs;
 use std::net::{TcpListener, TcpStream};
 use methods::Methods;
 use request::*;
 use response::*;
+use errors::*;
 
 const ROOT: &str = "www/";
+const OK_HEADER: &str = "HTTP/1.1 200 OK";
 
-fn handle_connection(mut stream: TcpStream)
+fn handle_connection(stream: TcpStream)
 {
-	let request = recive_request(&stream);
+	let request;
+	let body_path;
+	let body;
 
-	println!("Body =>{}<= END", request.buff);
-
-	let header = "HTTP/1.1 200 OK".to_string();
-	let body_path = match request.method {
-		Methods::GET(path) => path,
-		_ => "Not_Supported_method.html".to_owned()
-	};
-	let body = fs::read_to_string(ROOT.to_owned() + &body_path).unwrap();
+	match recive_request(&stream) {
+		Ok(new_request) => {request = new_request},
+		Err(_) => {
+			send_response(&stream, Response::new (
+				ErrorResponse::not_found(),
+				"".to_owned()
+			));
+			return ;
+		},
+	}
 	
-	send_response(&stream, Response::new (
-		header,
-		body
-	));
+	
+	let response: Response = gen_response(request);
+
+
+	let header = OK_HEADER.to_owned();
+	let response = Response {header, body};
+
+	send_response(&stream, response);
 }
 
 fn setup() -> TcpListener

@@ -1,19 +1,19 @@
-use std::{net::TcpStream, io::Read, alloc::System};
+use std::{net::TcpStream, io::Read};
 use crate::methods::Methods;
 
-pub struct Resquest {
+pub struct Request {
 	pub buff: String,
 	pub method: Methods,
 	pub protocol: String,
 }
 
-impl Resquest
+impl Request
 {
-	pub fn new(buff: String) -> Resquest {
+	pub fn new(buff: String) -> Result<Request, String> {
 		
 		let request = match buff.lines().next() {
 			Some(line) => line,
-			None => panic!("Empty request") // you need handle this 
+			None => return Err("Empty request".to_owned()),
 		};
 		
 		let request: Vec<&str> = request.split(' ').collect();
@@ -35,21 +35,21 @@ impl Resquest
 				_ => Methods::EMPTY
 		};
  
-		Resquest {
+		Ok(Request {
 			buff,
 			method,
 			protocol: "HTTP/1.1".to_string()
-		}
+		})
 	}
 }
 
-pub fn recive_request(mut stream: &TcpStream) -> Resquest
+pub fn recive_request(mut stream: &TcpStream) -> Result<Request, String>
 {
 	let mut buf: [u8; 1024] = [0; 1024];
 
 	stream.read(&mut buf).unwrap();	
 
-	Resquest::new(
+	Request::new(
 		String::from_utf8_lossy(&buf[..]).to_string()
 	)
 }
