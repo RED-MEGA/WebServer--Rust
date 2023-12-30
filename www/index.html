@@ -1,15 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>Welcome Page</title>
-</head>
-<body>
-    <div class="container">
-        <h1>Welcome to Our Website!</h1>
-        <p>This is a simple welcome page created using HTML and CSS.</p>
-    </div>
-</body>
+	<head>
+    <meta charset="UTF-8" />
+    <title>Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+	</head>
+	<body>
+		<div class="snap-y snap-mandatory h-screen w-full overflow-auto bg-center bg-cover bg-[url('images/background.png')]">
+			<div class="snap-start h-screen w-full flex flex-col items-center justify-center backdrop-blur-md">
+				<h1 class="mt-10 mb-40 text-center text-transparent text-9xl font-extrabold bg-clip-text bg-gradient-to-r from-indigo-500 to-white">Welcome</h1>
+				<img class="block mb-40 rounded-full w-96 h-96" src="images/profile.png">
+				<h1 class="text-center text-white text-6xl font-bold" ><span class="font-light">I'm, </span>Radouane Iben-hamou</h1>
+				<p class="p-5 text-center text-gray-200 text-3xl font-semibold">I do Code & 
+					<span class="font-semibold text-transparent text-3xl bg-clip-text bg-gradient-to-r from-red-600 to-red-100">
+						Chill
+					</span>
+				</p>
+			</div>
+			<div class="snap-start h-screen w-full flex flex-col items-center justify-center backdrop-blur-md">
+				<h2 class="p-10 text-center text-white text-5xl font-bold">About Me</h2>
+				<p class="text-center text-white text-2xl font-mono">
+					I'm Radouane Iben-hamou, a student at 1337, where coding is not just a curriculum
+					<br>but a way of life. Engaged in the immersive peer-to-peer learning system of 1337,
+					<br>I find inspiration in the collaborative spirit that defines our community.
+				</p>
+				<p class="text-center text-white text-2xl font-mono">
+					In this unique environment, knowledge flows seamlessly among students, creating a dynamic<br> exchange 
+					of ideas and solutions.
+				</p>
+			</div>
+			<div class="snap-start h-screen w-full flex flex-col items-center justify-center backdrop-blur-md">
+				<h2 class="text-center text-white text-5xl font-bold">Experience</h2>
+				<p class="p-2 font-thin text-center text-transparent text-3xl bg-clip-text bg-gradient-to-r from-red-900 to-white">Software Engineer</p>
+				<p class="p-10 text-center text-white text-2xl font-mono">Currently, I am immersed in the diverse world of software development, having embarked
+					<br>on a journey that began with mastering C and delving into low-level programming projects.
+					<br>Building on this foundation, I progressed to C++, where I expanded my knowledge to include
+					<br>network concepts and the utilization of Docker for efficient containerization. As part of 
+					<br>my educational odyssey, I transitioned to the realm of web development, where
+					<br>I honed my skills in both front-end and back-end technologies.</p>
+				<p class="text-center text-3xl text-white font-thin">C - C++ - Python - javaScript</p>
+			</div>
+			<div class="snap-start h-screen w-full flex flex-col items-center justify-center backdrop-blur-md">
+				<div class="Cub3D">
+					<h3 class="p-10 text-center text-white text-6xl font-bold">Cub3D</h3>
+					<img class="flex m-auto rounded-3xl w-96 h-56" src="images/cub3d.png">
+					<p class="p-10 text-center text-gray-200 text-2xl font-mono">
+						This project is inspired by the world-famous Wolfenstein 3D game,
+						<br>which was the first FPS ever. It will enable you to explore ray-casting.
+						<br>Your goal will be to make a dynamic view inside a maze,
+						<br>in which you'll have to find your way.
+					</p>
+				</div>
+				<hr class="w-52 m-auto">
+				<div class="Mirror">
+					<h3 class="p-10 text-center text-white text-6xl font-bold">Mirror</h3>
+					<img class="flex m-auto rounded-3xl w-96 h-56" src="images/mirror.png">
+					<p class="p-10 text-center text-gray-200 text-2xl font-mono">
+						Mirror is a unique and innovative dating app that stands out
+						<br>in the crowded world of online dating. Designed to create 
+						<br>meaningful connections, Mirror focuses on bringing people
+						<br>together based on shared interests and values.
+					</p>
+				</div>
+			</div>
+		</div>
+	</body>
 </html>
