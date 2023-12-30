@@ -9,10 +9,6 @@
 //   }
 // }
 
-const CRLF: &str = "\r\n";
-
-// const ERROR_BODY: &str = ;
-
 pub struct ErrorResponse {
     pub code: String,
     pub message: String,
@@ -25,11 +21,10 @@ impl ErrorResponse {
     }
 
     pub fn not_found() -> String {
-        let error = ErrorResponse {
+        ErrorResponse {
             code: "404".to_owned(),
             message: "Not Found".to_owned(),
-            details: "Not Found".to_owned()
-        };
-        error.error_response()
+            details: "Not Found".to_owned(),
+        }.error_response()
     }
 }

@@ -1,6 +1,6 @@
-use std::{io::Write, net::TcpStream, option, path};
+use std::{io::Write, net::TcpStream};
 
-use crate::{methods::*, request::Request, ROOT};
+use crate::{methods::*, request::Request, tools::{ROOT, get_permissions, OK_HEADER}, errors::ErrorResponse};
 
 pub struct Response {
     pub header: String,
@@ -11,11 +11,29 @@ impl Response {
     pub fn new(header: String, body: String) -> Response {
         Response { header, body }
     }
+	
+    pub fn default() -> Response {
+        Response {
+			header: ErrorResponse::not_found(),
+			body: "".to_owned()
+		}
+    }
 
-    pub fn get(path: &str) -> Option<Response>
-	{
-		ROOT + path.to_owned();
-	}
+    pub fn get(path: &str) -> Option<Response> {
+        let path = String::from(ROOT) + path;
+		
+		let permissions = match get_permissions(&path) {
+			Some(permissions) => permissions,
+			None => return None,
+		};
+		if permissions.readonly() {
+			Response::new(
+				OK_HEADER.to_owned(),
+				
+			)
+		}
+		None
+    }
 
     pub fn post(path: &str) -> Option<Response> {
         Some(Response {

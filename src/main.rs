@@ -1,62 +1,61 @@
+pub mod errors;
 pub mod methods;
 pub mod request;
 pub mod response;
-pub mod errors;
+pub mod tools;
 
-use std::fs;
-use std::net::{TcpListener, TcpStream};
-use methods::*;
+use errors::*;
 use request::*;
 use response::*;
-use errors::*;
+use std::net::{TcpListener, TcpStream};
 
-const ROOT: &str = "www/";
-const OK_HEADER: &str = "HTTP/1.1 200 OK";
+fn handle_connection(stream: TcpStream) {
+    let response;
 
-fn handle_connection(stream: TcpStream)
-{
-	let request;
-	let body;
+    match recive_request(&stream) {
+        Ok(new_request) => {
+            response = gen_response(new_request);
+        }
+        Err(_) => {
+            send_response(
+                &stream,
+                Response::new(ErrorResponse::not_found(), "".to_owned()),
+            );
+            return;
+        }
+    }
 
-	match recive_request(&stream) {
-		Ok(new_request) => {request = new_request},
-		Err(_) => {
-			send_response(&stream, Response::new (
-				ErrorResponse::not_found(),
-				"".to_owned()
-			));
-			return ;
-		},
-	}
-	
-	
-	let response: Response = gen_response(request);
+    let response = match response {
+        Some(response) => response,
+        None => {
+            send_response(
+                &stream,
+                Response::new(
+                    ErrorResponse::not_found(), // !! unsupported http method
+                    "".to_owned(),
+                ),
+            );
+            return;
+        }
+    };
 
-
-	let header = OK_HEADER.to_owned();
-	let response = Response {header, body};
-
-	send_response(&stream, response);
+    send_response(&stream, response);
 }
 
-fn setup() -> TcpListener
-{
-	TcpListener::bind("0.0.0.0:1337").unwrap()
+fn setup() -> TcpListener {
+    TcpListener::bind("0.0.0.0:1337").unwrap()
 }
 
-fn event_loop(server: TcpListener)
-{
-	for connection in server.incoming()
-	{
-		let stream = connection.unwrap();
-	
-		handle_connection(stream);
-	}
+fn event_loop(server: TcpListener) {
+    for connection in server.incoming() {
+        let stream = connection.unwrap();
+
+        handle_connection(stream);
+    }
 }
 
-fn main()
-{
-	let server = setup();
+fn main() {
+    let server = setup();
 
-	event_loop(server);
+    event_loop(server);
 }
