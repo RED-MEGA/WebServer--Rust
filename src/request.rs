@@ -22,6 +22,11 @@ impl Request {
         }
         println!("\n>");
 
+
+        eprintln!("<\n");
+        eprintln!("{}", buff);
+        eprintln!("\n>");
+
         let method = match request[0] {
             "GET" => Methods::GET(request[1].to_owned()),
             "POST" => Methods::POST(request[1].to_owned()),
@@ -30,9 +35,9 @@ impl Request {
         };
 
         Ok(Request {
-            buff,
+            buff: buff.clone(),
             method,
-            protocol: request[3].to_owned(),
+            protocol: request[2].to_string(),
         })
     }
 }

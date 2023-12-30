@@ -1,7 +1,8 @@
 use std::{io::Write, net::TcpStream};
 
-use crate::{methods::*, request::Request, tools::{ROOT, get_permissions, OK_HEADER}, errors::ErrorResponse};
+use crate::{methods::*, request::Request, tools::{ROOT, get_permissions, OK_HEADER, to_body}, errors::ErrorResponse};
 
+#[derive(Debug)]
 pub struct Response {
     pub header: String,
     pub body: String,
@@ -21,18 +22,23 @@ impl Response {
 
     pub fn get(path: &str) -> Option<Response> {
         let path = String::from(ROOT) + path;
-		
-		let permissions = match get_permissions(&path) {
-			Some(permissions) => permissions,
-			None => return None,
-		};
-		if permissions.readonly() {
-			Response::new(
-				OK_HEADER.to_owned(),
-				
-			)
+		match  {
+            true => {
+                if get_permissions(&path, (true, false)) {
+                    Some(Response::new(
+                        OK_HEADER.to_owned(),
+                        (|| {
+                            match to_body(&path) {
+                                Some(body) => body,
+                                None => "forbidden".to_owned(),
+                            }
+                        })()
+                    )) /// here
+                }
+                else { None }
+            },
+			false => { println!("EMPTY Method"); None }
 		}
-		None
     }
 
     pub fn post(path: &str) -> Option<Response> {
@@ -55,7 +61,7 @@ pub fn gen_response(request: Request) -> Option<Response> {
         Methods::GET(path) => Response::get(&path),
         Methods::POST(path) => Response::post(&path),
         Methods::DELETE(path) => Response::delete(&path),
-        _ => None,
+        _ => None
     }
 }
 

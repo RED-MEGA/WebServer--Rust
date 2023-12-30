@@ -15,6 +15,7 @@ fn handle_connection(stream: TcpStream) {
     match recive_request(&stream) {
         Ok(new_request) => {
             response = gen_response(new_request);
+            // panic!("{:?}", response);
         }
         Err(_) => {
             send_response(
@@ -38,7 +39,8 @@ fn handle_connection(stream: TcpStream) {
             return;
         }
     };
-
+    // println!("====> {:?}");
+    // send_response(&stream, Response {header:});
     send_response(&stream, response);
 }
 
