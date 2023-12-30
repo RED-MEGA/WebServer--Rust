@@ -33,7 +33,7 @@ fn handle_connection(stream: TcpStream) {
                 &stream,
                 Response::new(
                     ErrorResponse::not_found(), // !! unsupported http method
-                    "".to_owned(),
+                    "Error".to_owned(),
                 ),
             );
             return;
