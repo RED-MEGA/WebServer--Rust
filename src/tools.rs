@@ -1,4 +1,4 @@
-use std::fs::File;
+use std::{fs::File, path::Path, fmt::format};
 
 pub const OK_HEADER: &str = "HTTP/1.1 200 OK";
 pub const CRLF: &str = "\r\n";
@@ -16,11 +16,16 @@ pub fn to_body(path: &str) -> Option<String> {
     match std::fs::read_to_string(path) {
         Ok(data) => Some(data),
         Err(error) => match error.kind().to_string().contains("is a directory") {
-            true => match std::fs::read_to_string(path.to_owned() + "/index.html") {
+            true => match std::fs::read_to_string(format!("{}/index.html", path)) {
                 Ok(data) => Some(data),
                 Err(_) => panic!("invalid path + /index.html"),
             },
-            false => panic!("invalid path"),
+            false => match error.kind().to_string().contains("invalid data") {
+                true => ,
+                false => panic!("{}", error.kind()),
+            }
         },
     }
 }
+
+// false => panic!("invalid path: {}\nError: {}", path, error.kind().to_string()),
