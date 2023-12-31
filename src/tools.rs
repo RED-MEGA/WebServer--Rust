@@ -12,19 +12,21 @@ pub fn get_permissions(path: &str, permissions: (bool, bool)) -> bool {
         .is_ok()
 }
 
-pub fn to_body(path: &str) -> Option<String> {
-    match std::fs::read_to_string(path) {
-        Ok(data) => Some(data),
-        Err(error) => match error.kind().to_string().contains("is a directory") {
-            true => match std::fs::read_to_string(format!("{}/index.html", path)) {
-                Ok(data) => Some(data),
-                Err(_) => panic!("invalid path + /index.html"),
-            },
-            false => match error.kind().to_string().contains("invalid data") {
-                true => panic!("{}", error.kind()),
-                false => panic!("{}", error.kind()),
-            }
+pub fn to_body(path: &str) -> Option<Vec<u8>> {
+    if !get_permissions(path, (true, false)) {
+        return None;
+    }
+
+    let file_name = match path.contains(".") {
+        true => format!("{}{}", ROOT, path),
+        false => format!("{}{}/index.html", ROOT, path),
+    };
+
+    match File::open(file_name) {
+        Ok(file) => {
+            file. // open the file and make it to body
         },
+        Err(error) => {eprintln!("{}", error); None},
     }
 }
 

@@ -46,12 +46,13 @@ impl Response {
 
     pub fn get(path: &str, http_version: String) -> Option<Response> {
 
-        Response::new(http_version,
-            stat,
-            content_type,
-            content_length,
-            body
-        )
+        // Response::new(
+        //     http_version,
+        //     stat,
+        //     content_type,
+        //     content_length,
+        //     body
+        // )
     }
 
     pub fn post(path: &str, http_version: String) -> Option<Response> {
