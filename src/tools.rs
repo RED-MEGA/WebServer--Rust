@@ -21,7 +21,7 @@ pub fn to_body(path: &str) -> Option<String> {
                 Err(_) => panic!("invalid path + /index.html"),
             },
             false => match error.kind().to_string().contains("invalid data") {
-                true => ,
+                true => panic!("{}", error.kind()),
                 false => panic!("{}", error.kind()),
             }
         },

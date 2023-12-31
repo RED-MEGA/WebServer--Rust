@@ -1,4 +1,4 @@
-use std::{io::Write, net::TcpStream};
+use std::{fmt::format, io::Write, net::TcpStream};
 
 use crate::{
     errors::ErrorResponse,
@@ -7,65 +7,73 @@ use crate::{
     tools::{get_permissions, to_body, OK_HEADER, ROOT},
 };
 
-#[derive(Debug)]
 pub struct Response {
-    pub header: String,
-    pub body: String,
+    http_version: String,
+    stat: Stat,
+    content_type: String,
+    content_length: u32,
+    body: Vec<u8>,
 }
 
 impl Response {
-    pub fn new(header: String, body: String) -> Response {
-        Response { header, body }
-    }
-
-    pub fn default() -> Response {
+    pub fn new(
+        http_version: String,
+        stat: Stat,
+        content_type: String,
+        content_length: u32,
+        body: Vec<u8>,
+    ) -> Response {
         Response {
-            header: ErrorResponse::not_found(),
-            body: "".to_owned(),
+            http_version,
+            stat,
+            content_type,
+            content_length,
+            body,
         }
     }
 
-    pub fn get(path: &str) -> Option<Response> {
-        let path = String::from(ROOT) + path;
+    pub fn header(self) -> String {
+        let stat = match self.stat {
+            Stat::OK(status_code) => (status_code, "OK"),
+            Stat::KO(status_code) => (status_code, "KO"),
+        };
 
-        if get_permissions(&path, (true, false)) {
-            Some(Response::new(OK_HEADER.to_owned(), to_body(&path)?))
-        } else {
-            None
-        }
+        format!(
+            "{} {} {}\r\nContent-Type: {}\r\nContent-Length: {}\r\n\r\n",
+            self.http_version, stat.0, stat.1, self.content_type, self.content_length
+        )
     }
 
-    pub fn post(path: &str) -> Option<Response> {
-        Some(Response {
-            header: String::from("_"),
-            body: String::from("_"),
-        })
+    pub fn get(path: &str, http_version: String) -> Option<Response> {
+
+        Response::new(http_version,
+            stat,
+            content_type,
+            content_length,
+            body
+        )
     }
 
-    pub fn delete(path: &str) -> Option<Response> {
-        Some(Response {
-            header: String::from("_"),
-            body: String::from("_"),
-        })
+    pub fn post(path: &str, http_version: String) -> Option<Response> {
+        Some(ErrorResponse::not_found())
+    }
+
+    pub fn delete(path: &str, http_version: String) -> Option<Response> {
+        Some(ErrorResponse::not_found())
     }
 }
 
 pub fn gen_response(request: Request) -> Option<Response> {
     match request.method {
-        Methods::GET(path) => Response::get(&path),
-        Methods::POST(path) => Response::post(&path),
-        Methods::DELETE(path) => Response::delete(&path),
+        Methods::GET(path) => Response::get(&path, request.http_version),
+        Methods::POST(path) => Response::post(&path, request.http_version),
+        Methods::DELETE(path) => Response::delete(&path, request.http_version),
         _ => None,
     }
 }
 
 pub fn send_response(mut stream: &TcpStream, response: Response) {
-    let buff = format!(
-        "{}\r\nContent-Length: {}\r\n\r\n{}",
-        response.header,
-        response.body.len(),
-        response.body
-    );
-    stream.write(buff.as_bytes()).unwrap();
-    stream.flush().unwrap();
+    stream.write_all(response.header().as_bytes());
+    stream.write_all(&response.body);
+    stream.flush();
 }

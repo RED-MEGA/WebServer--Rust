@@ -7,7 +7,7 @@ pub mod tools;
 use errors::*;
 use request::*;
 use response::*;
-use std::net::{TcpListener, TcpStream};
+use std::{net::{TcpListener, TcpStream}, fs::{File, self, OpenOptions}, io::{Read, Write}};
 
 fn handle_connection(stream: TcpStream) {
     let response;
@@ -57,7 +57,34 @@ fn event_loop(server: TcpListener) {
 }
 
 fn main() {
-    let server = setup();
+    // let server = setup();
 
-    event_loop(server);
+    // event_loop(server);
+
+
+
+
+
+    let mut buffer = Vec::new();
+    
+    let _ = File::open("www/images/profile.png").unwrap()
+        .read_to_end(&mut buffer);
+
+    let _ = OpenOptions::new()
+        .write(true)
+        .create(true)
+        .truncate(true)
+        .open("image_test")
+        .unwrap()
+        .write_all(&buffer);
+
 }
+
+
+/*
+    HTTP/<http version> <status code> <stat>
+    Content-Type: <type of file>
+    Content-Length: <len of buffer>
+
+    <Binary data of the image>
+*/
