@@ -1,4 +1,4 @@
-use std::{fmt::format, io::Write, net::TcpStream};
+use std::{fmt::format, io::Write, net::TcpStream, path::Path};
 
 use crate::{
     errors::ErrorResponse,
@@ -46,13 +46,22 @@ impl Response {
 
     pub fn get(path: &str, http_version: String) -> Option<Response> {
 
-        // Response::new(
-        //     http_version,
-        //     stat,
-        //     content_type,
-        //     content_length,
-        //     body
-        // )
+        let body = to_body(path)?;
+
+        let content_type;
+        // for types in request.accepted_types {
+        //     if types.contains(Path::new(path).extension()?.to_str()) {
+        //         content_type = types;
+        //     }
+        // } // get accepted_types from request and change args
+
+        Some(Response::new(
+            http_version,
+            _OK,
+            content_type,
+            body.len() as u32,
+            body
+        ))
     }
 
     pub fn post(path: &str, http_version: String) -> Option<Response> {
