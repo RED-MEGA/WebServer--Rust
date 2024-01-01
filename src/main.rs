@@ -7,7 +7,7 @@ pub mod tools;
 use errors::*;
 use request::*;
 use response::*;
-use std::{net::{TcpListener, TcpStream}, fs::{File, self, OpenOptions}, io::{Read, Write}};
+use std::{net::{TcpListener, TcpStream}, fs::{File, OpenOptions}, io::{Read, Write}, os::unix::thread};
 
 fn handle_connection(stream: TcpStream) {
     let response;
@@ -20,7 +20,7 @@ fn handle_connection(stream: TcpStream) {
         Err(_) => {
             send_response(
                 &stream,
-                Response::new(ErrorResponse::not_found(), "".to_owned()),
+                ErrorResponse::not_found(),
             );
             return;
         }
@@ -31,10 +31,7 @@ fn handle_connection(stream: TcpStream) {
         None => {
             send_response(
                 &stream,
-                Response::new(
-                    ErrorResponse::not_found(), // !! unsupported http method
-                    "Error".to_owned(),
-                ),
+                ErrorResponse::not_found(),
             );
             return;
         }
@@ -52,32 +49,17 @@ fn event_loop(server: TcpListener) {
     for connection in server.incoming() {
         let stream = connection.unwrap();
 
-        handle_connection(stream);
+            handle_connection(stream);
+        // thread::(move || {
+        //     handle_connection(stream);
+        // });
     }
 }
 
 fn main() {
-    // let server = setup();
-
-    // event_loop(server);
-
-
-
-
-
-    let mut buffer = Vec::new();
-    
-    let _ = File::open("www/images/profile.png").unwrap()
-        .read_to_end(&mut buffer);
-
-    let _ = OpenOptions::new()
-        .write(true)
-        .create(true)
-        .truncate(true)
-        .open("image_test")
-        .unwrap()
-        .write_all(&buffer);
-
+    event_loop(
+        setup()
+    );
 }
 
 

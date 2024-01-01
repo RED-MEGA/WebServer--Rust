@@ -16,19 +16,6 @@ impl Request {
             Some(line) => line.split(' ').collect(),
             None => return Err("Empty request".to_owned()),
         };
-
-        /* Debug  */
-        println!("<\n");
-        for elm in &request {
-            println!("{}\n", elm);
-        }
-        println!("\n>");
-        
-        eprintln!("<\n");
-        eprintln!("{}", buff);
-        eprintln!("\n>");
-        /* Debug  */
-
         method = match request[0] {
             "GET" => Methods::GET(request[1].to_owned()),
             "POST" => Methods::POST(request[1].to_owned()),

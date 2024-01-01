@@ -1,10 +1,10 @@
-use std::{fmt::format, io::Write, net::TcpStream, path::Path};
+use std::{io::Write, net::TcpStream, path::Path};
 
 use crate::{
     errors::ErrorResponse,
     methods::*,
     request::Request,
-    tools::{get_permissions, to_body, OK_HEADER, ROOT},
+    tools::{to_body, ACCEPTED_TYPES, get_extension},
 };
 
 pub struct Response {
@@ -32,10 +32,10 @@ impl Response {
         }
     }
 
-    pub fn header(self) -> String {
+    pub fn header(&self) -> String {
         let stat = match self.stat {
             Stat::OK(status_code) => (status_code, "OK"),
-            Stat::KO(status_code) => (status_code, "KO"),
+            Stat::KO(status_code) => (status_code, "KO--"),
         };
 
         format!(
@@ -45,22 +45,22 @@ impl Response {
     }
 
     pub fn get(path: &str, http_version: String) -> Option<Response> {
+        let body: Vec<u8> = to_body(path)?;
 
-        let body = to_body(path)?;
+        let content_type: String = String::from("text/html");
 
-        let content_type;
-        // for types in request.accepted_types {
-        //     if types.contains(Path::new(path).extension()?.to_str()) {
-        //         content_type = types;
+        // for _content_type in CONTENT_TYPES {
+        //     if _content_type.contains(get_extension(path)) {
+        //         content_type = _content_type.to_owned();
         //     }
-        // } // get accepted_types from request and change args
+        // }
 
         Some(Response::new(
             http_version,
             _OK,
             content_type,
             body.len() as u32,
-            body
+            body,
         ))
     }
 
@@ -83,7 +83,7 @@ pub fn gen_response(request: Request) -> Option<Response> {
 }
 
 pub fn send_response(mut stream: &TcpStream, response: Response) {
-    stream.write_all(response.header().as_bytes());
-    stream.write_all(&response.body);
-    stream.flush();
+    let _ = stream.write_all(response.header().as_bytes());
+    let _ = stream.write_all(&response.body);
+    let _ = stream.flush();
 }
